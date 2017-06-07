@@ -1,5 +1,7 @@
 Simple, statically configurable NGINX proxy container with [Let's Encrypt](https://letsencrypt.org/) automatic certificate renewal inspired by [docker-letsencrypt-nginx-proxy-companion](https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion).
 
+Still in testing
+
 ### Features
 
 * Proxies can be configured using environment variables
