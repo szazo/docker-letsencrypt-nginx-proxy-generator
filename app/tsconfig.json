@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "commonjs", 
+    "target": "es6",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "outDir": "build"
+  },
+  "files": [
+    "src/main.ts",
+    "src/config-generator.ts",
+    "src/proxy.ts",
+    "src/certificate-client.ts",
+    "src/certificate-generator.ts",
+    "src/config-preparer.ts",
+    "src/environment-variables-parser.ts",
+    "src/refresh-certs.ts",
+    "src/nginx-reloader.ts"
+  ]
+}

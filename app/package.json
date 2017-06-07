@@ -1,0 +1,20 @@
+{
+  "name": "nginx-letsencrypt-proxy",
+  "version": "1.0.0",
+  "description": "Generates NGINX proxy configuration from yaml",
+  "main": "refresh-certs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/debug": "0.0.29",
+    "@types/mkdirp": "^0.3.29",
+    "@types/node": "^7.0.28",
+    "debug": "^2.6.8",
+    "ejs": "2.5.6",
+    "mkdirp": "^0.5.1",
+    "typescript": "2.3.4"
+  }
+}
