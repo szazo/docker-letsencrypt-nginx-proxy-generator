@@ -32,6 +32,10 @@ if (args.length != 4) {
           if (result.success.length > 0) {
             console.log(`Certificate successfully requested / renewed for the following domains:`, result.success.map(x=>x.domain));
           }
+
+          if (result.notChanged.length > 0) {
+            console.log(`Nothing to do with certificates for the following domains:`, result.notChanged.map(x=>x.domain));
+          }
           
           if (result.errors.length > 0) {
             console.error(`Couldn't request certificate for the following domains, see log for details:`, result.errors.map(x=>x.domain));
