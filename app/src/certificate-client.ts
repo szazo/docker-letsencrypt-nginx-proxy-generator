@@ -1,4 +1,7 @@
 import { exec } from 'child_process';
+import * as debug from 'debug';
+
+let d = debug('CertificateClient');
 
 export enum RequestCertificateResult {
   success,
@@ -20,6 +23,8 @@ export class CertificateClient {
       
       exec(cmd, (err: any, stdout: string, stderr: string) => {
 
+        d(`simp_le stdout for ${domain}`, stdout);
+        
         if (err) {
           if (exitCode == 1) {
             resolve(RequestCertificateResult.renewNotRequired);
