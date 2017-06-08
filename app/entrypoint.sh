@@ -1,6 +1,6 @@
 #!/bin/sh
 
-trap "exit 0;" SIGTERM
+trap "exit 0;" INT
 
 while true;
 do
