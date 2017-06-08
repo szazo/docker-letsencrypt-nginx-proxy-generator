@@ -24,6 +24,8 @@ Proxies can be defined with `PROXY_*` environment variables:
 * The format: `PROTO://source.domain.name->PROTO://target.host:PORT`
 * Example: `https://apple.example.com->http://1.2.3.4:80`
 
+Debug messages can be enabled using `DEBUG` environment variable: `DEBUG=*`
+
 ### Example docker compose configuration
 
 ```yaml
@@ -46,6 +48,7 @@ services:
       - NGINX_CONTAINER=nginx-proxy
       - PROXY_1=https://apple.example.com->http://1.2.3.4:80
       - PROXY_2=https://banana.example.com->http://11.22.33.44:443
+      - DEBUG=*
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - nginx_certs:/output/nginx_certs
