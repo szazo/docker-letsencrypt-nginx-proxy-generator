@@ -43,10 +43,9 @@ services:
   config-gen:
     image: szazo/letsencrypt-nginx-proxy-generator
     environment:
+      - NGINX_CONTAINER=nginx-proxy
       - PROXY_1=https://apple.example.com->http://1.2.3.4:80
       - PROXY_2=https://banana.example.com->http://11.22.33.44:443
-      - NGINX_CONTAINER=nginx-proxy
-      - DEBUG=*
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - nginx_certs:/output/nginx_certs
