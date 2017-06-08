@@ -3,19 +3,23 @@ Simple, statically configurable NGINX proxy container with [Let's Encrypt](https
 Still in testing
 
 
-### Features
+## Features
 
 * Proxies can be configured using environment variables
 * Automatic certificate request and renewal using [Simp_le](https://github.com/zenhack/simp_le/)
 * Automatic NGINX reload upon configuration change
 
-### Configuration
+## Configuration
 
 In order to allow the container to store generated configurations and certificates, please map the following volumes:
 * NGINX `/etc/nginx/certs` directory <-> `nginx_certs` volume <-> generator `/output/nginx_certs directory` for generated certificates.
 * NGINX `/etc/nginx/conf.d` directory <-> `nginx_confd` volume <-> generator `/output/nginx_confd` directory
 * NGINX `/etc/nginx/vhost.d` directory <-> `nginx_vhostd` volume <-> generator `/output/nginx_vhostd` directory
 * NGINX `/usr/share/nginx/html` directory <-> `nginx_html` volume <-> generator `/output/nginx_html` directory
+
+In order for the container to be able to reload the NGINX using Docker API:
+- pass the NGINX's container name using `NGINX_CONTAINER` environment variable.
+- map the host's `/var/run/docker.sock` socket file into the container with the same path.
 
 ### Example docker compose configuration
 
@@ -29,7 +33,6 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - nginx_certs:/etc/nginx/certs
       - nginx_confd:/etc/nginx/conf.d
       - nginx_vhostd:/etc/nginx/vhost.d
@@ -53,6 +56,10 @@ volumes:
   nginx_vhostd:
   nginx_html:
 ```
+
+### Diagram
+
+The following diagrams shows the connection between the elements.
 
 ```
                                            .------------------------.
