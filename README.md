@@ -9,7 +9,15 @@ Still in testing
 * Automatic certificate request and renewal using [Simp_le](https://github.com/zenhack/simp_le/)
 * Automatic NGINX reload upon configuration change
 
-### Example docker compose configuration:
+### Configuration
+
+In order to allow the container to store generated configurations and certificates, please map the following volumes:
+* NGINX `/etc/nginx/certs directory` <-> `nginx_certs volume` <-> `generator /output/nginx_certs directory` for generated certificates.
+* NGINX /etc/nginx/conf.d directory <-> nginx_confd volume <-> generator /output/nginx_confd directory
+* NGINX /etc/nginx/vhost.d directory <-> nginx_vhostd volume <-> generator /output/nginx_vhostd directory
+* NGINX /usr/share/nginx/html directory <-> nginx_html volume <-> generator /output/nginx_html directory
+
+### Example docker compose configuration
 
 ```yaml
 version: '2'
@@ -27,7 +35,7 @@ services:
       - nginx_vhostd:/etc/nginx/vhost.d
       - nginx_html:/usr/share/nginx/html
   config-gen:
-    image: szazo/static-letsencrypt-nginx-proxy-gen
+    image: szazo/letsencrypt-nginx-proxy-generator
     environment:
       - PROXY_1=https://apple.example.com->http://1.2.3.4:80
       - PROXY_2=https://banana.example.com->http://11.22.33.44:443
