@@ -18,8 +18,6 @@ interface DomainResult {
   result: DomainCertificateResult;
 }
 
-let d = debug('CertificateGenerator');
-
 export class CertificateGenerator {
 
   constructor(
@@ -45,7 +43,7 @@ export class CertificateGenerator {
       catch (err) {
         // there was error with the domain, add the result
         results.push({ domain: domain, result: DomainCertificateResult.error });
-        d(err);
+        console.error(err);
       }
       finally {
         // change current directory back

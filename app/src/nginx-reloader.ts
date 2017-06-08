@@ -1,12 +1,17 @@
 import * as http from 'http';
 
+export enum NginxReloadResult {
+	success,
+	missingEnvironmentVariable
+}
+
 export class NginxReloader {
 
   async reload() {
 
 		let nginxContainer = process.env['NGINX_CONTAINER'];
 		if (!nginxContainer) {
-			throw new Error('NGINX_CONTAINER environment variable is missing, please set it to the nginx\' full container name.');
+			return NginxReloadResult.missingEnvironmentVariable;
 		}
 
     return new Promise((resolve, reject) => {
@@ -30,7 +35,7 @@ export class NginxReloader {
 				
 				let body = '';
 				response.on('data', chunk => body += chunk);
-				response.on('end', () => resolve(body));
+				response.on('end', () => resolve(NginxReloadResult.success));
 			});
 
 			request.on('error', err => {
