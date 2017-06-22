@@ -7,32 +7,9 @@ Still in testing
 * Proxies can be configured using environment variables
 * Automatic certificate request and renewal using [Simp_le](https://github.com/zenhack/simp_le/)
 * Automatic NGINX reload upon configuration change
+* Multiple locations can be defined within a virtual host
 
 ## Configuration
-
-### Volumes
-
-In order to allow the container to store generated configurations and certificates, map the following volumes:
-* NGINX `/etc/nginx/certs` directory ⟷ `nginx_certs` volume ⟷ `/output/nginx_certs` directory for generated certificates.
-* NGINX `/etc/nginx/conf.d` directory ⟷ `nginx_confd` volume ⟷ `/output/nginx_confd` directory for generated configurations.
-* NGINX `/etc/nginx/vhost.d` directory ⟷ `nginx_vhostd` volume ⟷ `/output/nginx_vhostd` directory for common includes.
-* NGINX `/usr/share/nginx/html` directory ⟷ `nginx_html` volume ⟷ `/output/nginx_html` directory for Let's Encrypt challenge files.
-
-### NGINX reload
-
-In order for the container to be able to reload the NGINX using Docker API:
-- pass the NGINX's container name using `NGINX_CONTAINER` environment variable,
-- map the host's `/var/run/docker.sock` socket file into the container with the same path.
-
-### Proxies
-
-Proxies can be defined with `PROXY_*` environment variables:
-* The format: `PROTO://source.domain.name->PROTO://target.host:PORT`
-* Example: `https://apple.example.com->http://1.2.3.4:80`
-
-### Debug message
-
-Debug messages can be enabled using `DEBUG` environment variable: `DEBUG=*`
 
 ### Example docker compose configuration
 
@@ -56,6 +33,7 @@ services:
       - NGINX_CONTAINER=nginx-proxy
       - PROXY_1=https://apple.example.com->http://1.2.3.4:80
       - PROXY_2=https://banana.example.com->http://11.22.33.44:443
+      - PROXY_3=https://banana.example.com/pear->http://11.22.33.44:443/cherry
       - DEBUG=*
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -69,6 +47,30 @@ volumes:
   nginx_vhostd:
   nginx_html:
 ```
+
+### Proxies
+
+Proxies can be defined with `PROXY_*` environment variables:
+* The format: `PROTO://source.domain.name/optional-path->PROTO://target.host:PORT/optional-path`
+* Example: `https://apple.example.com/path->http://1.2.3.4:80/target-path`
+
+### NGINX reload
+
+In order for the container to be able to reload the NGINX using Docker API:
+- pass the NGINX's container name using `NGINX_CONTAINER` environment variable,
+- map the host's `/var/run/docker.sock` socket file into the container with the same path.
+
+### Volumes
+
+In order to allow the container to store generated configurations and certificates, map the following volumes:
+* NGINX `/etc/nginx/certs` directory ⟷ `nginx_certs` volume ⟷ `/output/nginx_certs` directory for generated certificates.
+* NGINX `/etc/nginx/conf.d` directory ⟷ `nginx_confd` volume ⟷ `/output/nginx_confd` directory for generated configurations.
+* NGINX `/etc/nginx/vhost.d` directory ⟷ `nginx_vhostd` volume ⟷ `/output/nginx_vhostd` directory for common includes.
+* NGINX `/usr/share/nginx/html` directory ⟷ `nginx_html` volume ⟷ `/output/nginx_html` directory for Let's Encrypt challenge files.
+
+### Debug message
+
+Debug messages can be enabled using `DEBUG` environment variable: `DEBUG=*`
 
 ### Diagram
 
