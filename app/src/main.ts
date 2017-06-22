@@ -1,9 +1,9 @@
-import { Proxy } from './proxy';
 import { ConfigGenerator } from './config-generator';
 import { CertificateGenerator, DomainCertificateResult } from './certificate-generator';
 import { ConfigPreparer } from './config-preparer';
 import { EnvironmentVariablesParser } from './environment-variables-parser';
 import { NginxReloader, NginxReloadResult } from './nginx-reloader';
+import { HttpsVirtualHost } from './https-virtual-host';
 import * as debug from 'debug';
 
 let d = debug('Main');
@@ -26,8 +26,8 @@ export class Main {
 
     // parse the environment variables
     d('parsing environment variables...');
-    let proxies = this.parseProxies();
-    d('parsed proxies', proxies);
+    let proxies = this.parseEnvironmentVariables();
+    d('parsed hosts', proxies);
     
     // generate nginx config, maybe with http only
     d('generating configuration...');
@@ -38,7 +38,7 @@ export class Main {
     await this.reloadNginx();
 
     // request the certificates
-    d('requesting certificates...');
+    d('requesting certificates...', proxies.map(x => x.virtualHost));
     let certificatesResult = await this.requestCertificates(proxies);
     d('certificate request result', certificatesResult);
     
@@ -60,7 +60,7 @@ export class Main {
     return certificatesResult;
   }
 
-  private parseProxies() {
+  private parseEnvironmentVariables() {
     return this.variableParser.parse(process.env);
   }
 
@@ -68,14 +68,14 @@ export class Main {
     this.configPreparer.prepare();
   }
 
-  private generateConfig(proxies: Proxy[]) {
+  private generateConfig(proxies: HttpsVirtualHost[]) {
     this.configGenerator.generate(proxies);
   }
 
-  private async requestCertificates(proxies: Proxy[]) {
+  private async requestCertificates(proxies: HttpsVirtualHost[]) {
     
     let results = await this.certificateGenerator.generate(
-      proxies.map(x=>x.srcVirtualHost));
+      proxies.map(x=>x.virtualHost));
 
     let errors = results.filter(x=>x.result == DomainCertificateResult.error);
     let success = results.filter(x=>x.result == DomainCertificateResult.success);

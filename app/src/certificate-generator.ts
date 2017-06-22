@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as debug from 'debug';
 
-import { Proxy } from './proxy';
 import { CertificateClient,
          RequestCertificateResult } from './certificate-client';
 

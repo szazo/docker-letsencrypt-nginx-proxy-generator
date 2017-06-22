@@ -1,0 +1,3 @@
+location <%= path %> {
+    proxy_pass <%= destinationProtocol %>://<%= destinationServer %>:<%= destinationPort %><%= destinationPath %>;
+}

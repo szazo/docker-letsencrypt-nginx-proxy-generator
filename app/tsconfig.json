@@ -11,7 +11,7 @@
   "files": [
     "src/main.ts",
     "src/config-generator.ts",
-    "src/proxy.ts",
+    "src/https-virtual-host.ts",
     "src/certificate-client.ts",
     "src/certificate-generator.ts",
     "src/config-preparer.ts",
