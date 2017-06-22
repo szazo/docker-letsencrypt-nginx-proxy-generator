@@ -7,7 +7,7 @@ Still in testing
 * Proxies can be configured using environment variables
 * Automatic certificate request and renewal using [Simp_le](https://github.com/zenhack/simp_le/)
 * Automatic NGINX reload upon configuration change
-* Multiple proxies can be defined for a single virtual host for its different paths
+* Multiple proxies can be defined for a single virtual host for different paths
 
 ## Configuration
 
@@ -51,7 +51,7 @@ volumes:
 ### Proxies
 
 Proxies can be defined with `PROXY_*` environment variables:
-* The format: `PROTO://source.domain.name/optional-path->PROTO://target.host:PORT/optional-path`
+* The format: `PROTO://source.domain.name/optional-path->PROTO://target.host:PORT/optional-path` (currently only `https` source PROTO supported)
 * Example: `https://apple.example.com/path->http://1.2.3.4:80/target-path`
 
 ### NGINX reload
