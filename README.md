@@ -7,7 +7,7 @@ Still in testing
 * Proxies can be configured using environment variables
 * Automatic certificate request and renewal using [Simp_le](https://github.com/zenhack/simp_le/)
 * Automatic NGINX reload upon configuration change
-* Multiple locations can be defined within a virtual host
+* Multiple proxies can be defined for a single virtual host for its different paths
 
 ## Configuration
 
@@ -32,8 +32,8 @@ services:
     environment:
       - NGINX_CONTAINER=nginx-proxy
       - PROXY_1=https://apple.example.com->http://1.2.3.4:80
-      - PROXY_2=https://banana.example.com->http://11.22.33.44:443
-      - PROXY_3=https://banana.example.com/pear->http://11.22.33.44:443/cherry
+      - PROXY_2=https://banana.example.com->https://11.22.33.44:443
+      - PROXY_3=https://banana.example.com/pear->http://22.33.44.55:80/cherry
       - DEBUG=*
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
