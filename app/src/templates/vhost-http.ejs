@@ -1,15 +1,8 @@
-upstream <%= vhost %> {
-   # Container: coursecatalog_root-redirect_1@nginx-proxy
-   server <%= server %>:<%= port %>;
-}
-
 server {
     server_name <%= vhost %>;
     listen 80;
     access_log /var/log/nginx/access.log vhost;
     include /etc/nginx/vhost.d/default;
 
-    location / {
-        proxy_pass <%= protocol %>://<%= vhost %>;
-    }
+    <%= locations %>
 }

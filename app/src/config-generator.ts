@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as mkdirp from 'mkdirp';
 
 const ejs = require('ejs');
-import { Proxy } from './proxy';
+import { HttpsVirtualHost, VirtualHostLocation } from './https-virtual-host';
 
 export class ConfigGenerator {
 
@@ -12,16 +12,17 @@ export class ConfigGenerator {
     private nginxConfdDir: string) {
   }
   
-  generate(proxies: Proxy[]) {
+  generate(vhosts: HttpsVirtualHost[]) {
 
     let core = ejs.render(this.loadFile(path.join(
       __dirname, 'templates/core.ejs')), {});
-    let vhostsConfig = this.generateVhostsConfig(proxies);
+    let vhostsConfig = this.generateVhostsConfig(vhosts);
 
     let config = core + '\n' + vhostsConfig;
 
     this.ensureConfdDir();
     let outputFilePath = path.join(this.nginxConfdDir, 'default.conf');
+
     this.saveFile(outputFilePath, config);
   }
 
@@ -29,18 +30,20 @@ export class ConfigGenerator {
     mkdirp.sync(this.nginxConfdDir);
   }
 
-  private generateVhostsConfig(proxies: Proxy[]) {
+  private generateVhostsConfig(vhosts: HttpsVirtualHost[]) {
 
     let config = '';
-    for (let proxy of proxies) {
-      let templateName = this.resolveVhostTemplate(proxy.srcVirtualHost);
-      config += this.renderTemplate(proxy, templateName);
+    for (let vhost of vhosts) {
+      let templateName = this.resolveVhostTemplate(vhost.virtualHost);
+      config += this.renderVhost(vhost, templateName);
       config += '\n\n';
     }
 
     return config;
   }
 
+  // Check whether there is certificate file for the virtual host.
+  // If found, use the https template; otherwise the http one.
   private resolveVhostTemplate(virtualHost: string) {
     let certPath = path.join(this.nginxCertsDir, virtualHost, 'fullchain.pem');
 
@@ -53,16 +56,36 @@ export class ConfigGenerator {
     return templateName;
   }
 
-  private renderTemplate(proxy: Proxy, templateName: string) {
+  private renderVhost(vhost: HttpsVirtualHost, templateName: string) {
+
+    let locations = vhost.locations
+          .map(x => this.renderLocation(x))
+          .reduce((prev, current) => prev + current);
+
     let params = {
-      vhost: proxy.srcVirtualHost,
-      protocol: proxy.dstProtocol,
-      server: proxy.dstAddress,
-      port: proxy.dstPort
+      vhost: vhost.virtualHost,
+      locations: locations
     };
 
     let template = this.loadFile(path.join(__dirname,
                                            `templates/${templateName}`));
+    return ejs.render(template, params);
+  }
+
+  private renderLocation(location: VirtualHostLocation) {
+
+    let proxyPass = location.proxyPass;
+    
+    let params = {
+      path: location.path,
+      destinationProtocol: proxyPass.protocol,
+      destinationServer: proxyPass.host,
+      destinationPort: proxyPass.port,
+      destinationPath: proxyPass.path
+    }
+
+    let template = this.loadFile(path.join(__dirname,
+                                           `templates/location.ejs`));
     return ejs.render(template, params);
   }
 

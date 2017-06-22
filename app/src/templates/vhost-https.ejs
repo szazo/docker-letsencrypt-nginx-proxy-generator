@@ -1,7 +1,3 @@
-upstream <%= vhost %> {
-   # Container: coursecatalog_root-redirect_1@nginx-proxy
-   server <%= server %>:<%= port %>;
-}
 server {
     server_name <%= vhost %>;
     listen 80;
@@ -22,7 +18,6 @@ server {
     # ssl_dhparam /etc/nginx/certs/<%= vhost %>.dhparam.pem;
     add_header Strict-Transport-Security "max-age=31536000";
     include /etc/nginx/vhost.d/default;
-    location / {
-        proxy_pass <%= protocol %>://<%= vhost %>;
-    }
+
+    <%= locations %>
 }
