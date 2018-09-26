@@ -74,7 +74,7 @@ export class EnvironmentVariablesParser {
 
   private parseProxy(val: string): Proxy | null {
 
-    let regex = /^(\w+)\:\/\/([\w.]+)(\/.*)?->(\w+)\:\/\/([\w.]+)\:(\d+)(\/.*)?$/;
+    let regex = /^(\w+)\:\/\/([\w.-]+)(\/.*)?->(\w+)\:\/\/([\w.-]+)\:(\d+)(\/.*)?$/;
     let match = regex.exec(val);
     if (match == null) {
       return null;
