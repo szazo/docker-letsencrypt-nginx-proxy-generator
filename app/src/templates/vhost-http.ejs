@@ -2,7 +2,7 @@ server {
     server_name <%= vhost %>;
     listen 80;
     access_log /var/log/nginx/access.log vhost;
-    include /etc/nginx/vhost.d/default;
+    <%= acme_challenge_location %>
 
     <%= locations %>
 }

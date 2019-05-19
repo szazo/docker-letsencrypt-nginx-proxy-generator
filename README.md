@@ -54,6 +54,10 @@ Proxies can be defined with `PROXY_*` environment variables:
 * The format: `PROTO://source.domain.name/optional-path->PROTO://target.host:PORT/optional-path` (currently only `https` source PROTO supported)
 * Example: `https://apple.example.com/path->http://1.2.3.4:80/target-path`
 
+It is possible to run secondary letsencrypt clients on the proxied destinations by using an optional fallback `proxy_pass` for the `./well-known/acme-challenge` location.
+
+To opt in define `ACME_CHALLENGE_PROXY_*` environment variables the same way you would any other proxy. Remember to not set any source path for this to work!
+
 ### NGINX reload
 
 In order for the container to be able to reload the NGINX using Docker API:
