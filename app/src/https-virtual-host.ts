@@ -1,6 +1,7 @@
 export interface HttpsVirtualHost {
   virtualHost: string;
   locations: VirtualHostLocation[];
+  fallbackAcmeChallengeLocation: VirtualHostLocation | null;
 }
 
 export interface VirtualHostLocation {

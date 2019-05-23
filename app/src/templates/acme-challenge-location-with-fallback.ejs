@@ -1,0 +1,5 @@
+    include /etc/nginx/vhost.d/acme-challenge-location-with-fallback;
+
+    location @fallback_acme_challenge {
+        proxy_pass <%= destinationProtocol %>://<%= destinationServer %>:<%= destinationPort %><%= destinationPath %>;
+    }

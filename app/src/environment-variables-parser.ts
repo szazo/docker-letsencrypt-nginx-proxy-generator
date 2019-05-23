@@ -16,18 +16,30 @@ export class EnvironmentVariablesParser {
   parse(env: { [ key: string ]: string }) {
 
     // filter PROXY_* variables
-    let filtered = this.filterVariables(env);
+    let proxyVarsFiltered = this.filterVariables(env, 'PROXY_');
+
+    // filter ACME_CHALLENGE_PROXY_* variables
+    let acmeChallengeVarsFiltered = this.filterVariables(env, 'ACME_CHALLENGE_PROXY_');
 
     // parse variables
-    let proxies = this.parseProxies(filtered);
+    let proxies = this.parseProxies(proxyVarsFiltered);
+    let acmeChallengeProxies = this.parseProxies(acmeChallengeVarsFiltered);
+    this.validateAcmeChallengeProxies(acmeChallengeProxies);
 
     // get https proxies
-    let httpsVirtualHosts = this.groupHttpsProxies(proxies);
+    let httpsVirtualHosts = this.groupHttpsProxies(proxies, acmeChallengeProxies);
 
     return httpsVirtualHosts;
   }
 
-  private groupHttpsProxies(proxies: Proxy[]) {
+  private validateAcmeChallengeProxies(acmeChallengeProxies: Proxy[]) {
+    for (let acmeChallengeProxy of acmeChallengeProxies) {
+      if (acmeChallengeProxy.srcPath && acmeChallengeProxy.srcPath != '/')
+        throw new Error(`Error in acme challenge proxy config of vhost ${acmeChallengeProxy.srcVirtualHost}: ${acmeChallengeProxy.srcPath} source path not supported here, use only without path!`);
+    }
+  }
+
+  private groupHttpsProxies(proxies: Proxy[], acmeChallengeProxies: Proxy[]) {
 
     let httpsProxies = proxies.filter(x=>x.srcProtocol == 'https');
 
@@ -38,7 +50,8 @@ export class EnvironmentVariablesParser {
       if (!vhost) {
         vhost = {
           virtualHost: proxy.srcVirtualHost,
-          locations: []
+          locations: [],
+          fallbackAcmeChallengeLocation: null,
         };
         virtualHosts.push(vhost);
       }
@@ -55,29 +68,42 @@ export class EnvironmentVariablesParser {
       vhost.locations.push(location);
     }
 
+    for (let proxy of acmeChallengeProxies) {
+
+      let vhost = virtualHosts.find(x=>x.virtualHost == proxy.srcVirtualHost);
+      if (vhost) {
+        vhost.fallbackAcmeChallengeLocation = {
+          path: proxy.srcPath ? proxy.srcPath : '/',
+          proxyPass: {
+            protocol: proxy.dstProtocol,
+            host: proxy.dstAddress,
+            port: proxy.dstPort,
+            path: proxy.dstPath
+          }
+        };
+      }
+    }
+
     return virtualHosts;
   }
 
   private parseProxies(filtered: { [ key: string ]: string }) {
     let proxies: Proxy[] = [];
     for (let key in filtered) {
-      let proxy = this.parseProxy(filtered[key]);
-      if (proxy == null) {
-        throw new Error(
-          `Couldn't parse '${key}' variable with value '${filtered[key]}'. Valid value e.g. 'https://example.com/path->http://1.2.3.4:80/path'`);
-      }
+      let proxy = this.parseProxy(key, filtered[key]);
       proxies.push(proxy);
     }
 
     return proxies;
   }
 
-  private parseProxy(val: string): Proxy | null {
+  private parseProxy(variable: string, val: string): Proxy {
 
     let regex = /^(\w+)\:\/\/([\w.-]+)(\/.*)?->(\w+)\:\/\/([\w.-]+)\:(\d+)(\/.*)?$/;
     let match = regex.exec(val);
     if (match == null) {
-      return null;
+      throw new Error(
+        `Couldn't parse '${variable}' variable with value '${val}'. Valid value e.g. 'https://example.com/path->http://1.2.3.4:80/path'`);
     }
 
     return {
@@ -90,16 +116,14 @@ export class EnvironmentVariablesParser {
       dstPath: match[7]
     };
   }
-  
-  // get environment variables which starts with PROXY_
-  private filterVariables(variables: { [ key: string ]: string }) {
+
+  // get environment variables which starts with prefix
+  private filterVariables(variables: { [ key: string ]: string }, prefix: string) {
     
     let proxies: { [ key: string ]: string } = {};
-    // let variables: { [ key: string ]: string } = process.env;
     for (let key in variables) {
-      if (key.startsWith('PROXY_')) {
+      if (key.startsWith(prefix)) {
         proxies[key] = variables[key];
-        // proxies.push(variables[key]);
       }
     }
 

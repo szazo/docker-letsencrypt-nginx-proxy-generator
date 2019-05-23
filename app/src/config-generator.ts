@@ -62,9 +62,12 @@ export class ConfigGenerator {
           .map(x => this.renderLocation(x))
           .reduce((prev, current) => prev + current);
 
+    const acmeChallengeLocation = this.renderAcmeChallengeLocation(vhost.fallbackAcmeChallengeLocation);
+
     let params = {
       vhost: vhost.virtualHost,
-      locations: locations
+      locations: locations,
+      acme_challenge_location: acmeChallengeLocation,
     };
 
     let template = this.loadFile(path.join(__dirname,
@@ -87,6 +90,29 @@ export class ConfigGenerator {
     let template = this.loadFile(path.join(__dirname,
                                            `templates/location.ejs`));
     return ejs.render(template, params);
+  }
+
+  private renderAcmeChallengeLocation(location: VirtualHostLocation) {
+    let params = {};
+    let tmplFile;
+
+    if (location) {
+      const proxyPass = location.proxyPass;
+
+      params = {
+        destinationProtocol: proxyPass.protocol,
+        destinationServer: proxyPass.host,
+        destinationPort: proxyPass.port,
+        destinationPath: proxyPass.path
+      }
+
+      tmplFile = `templates/acme-challenge-location-with-fallback.ejs`;
+    } else {
+      tmplFile = `templates/acme-challenge-location.ejs`;
+    }
+
+    const tmpl = this.loadFile(path.join(__dirname, tmplFile));
+    return ejs.render(tmpl, params);
   }
 
   private loadFile(filename: string) {

@@ -10,8 +10,12 @@ export class ConfigPreparer {
   prepare() {
     mkdirp.sync(this.nginxVhostdDir);
 
-    fs.writeFileSync(path.join(this.nginxVhostdDir, 'default'),
-                     fs.readFileSync(path.join(
-                       __dirname, 'templates/well-known-location.conf')));
+    const files = ['acme-challenge-location', 'acme-challenge-location-with-fallback'];
+
+    for (const file of files) {
+      fs.writeFileSync(path.join(this.nginxVhostdDir, file),
+      fs.readFileSync(path.join(
+        __dirname, `templates/${file}.conf`)));
+    }
   }
 }
