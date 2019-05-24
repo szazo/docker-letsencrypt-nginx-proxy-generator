@@ -1,4 +1,4 @@
-FROM node:7
+FROM node:7-stretch
 
 # download and install simp_le
 RUN mkdir /simp_le
