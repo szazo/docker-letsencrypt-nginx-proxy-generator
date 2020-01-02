@@ -12,7 +12,7 @@ export class CertificateClient {
   }
   
   async request(domain: string) {
-    let cmd = `${this.simp_lePath} -f account_reg.json -f key.pem -f fullchain.pem -d ${domain} --default_root ${this.wwwRoot}`;
+    let cmd = `${this.simp_lePath} -f account_reg.json -f account_key.json -f key.pem -f fullchain.pem -d ${domain} --default_root ${this.wwwRoot}`;
 
     return new Promise<RequestCertificateResult>((resolve, reject) => {
 
