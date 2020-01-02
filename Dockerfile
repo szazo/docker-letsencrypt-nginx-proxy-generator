@@ -1,6 +1,6 @@
 FROM node:7-stretch
 
-# download and install simp_le
+# download and install latest simp_le
 RUN mkdir /simp_le
 RUN git -C /simp_le clone --depth 1 https://github.com/zenhack/simp_le.git .
 
